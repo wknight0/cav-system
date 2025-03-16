@@ -1,15 +1,17 @@
-use csv::ReaderBuilder;
 use std::collections::HashMap;
 use std::error::Error;
+
+use csv::ReaderBuilder;
 
 use crate::configuration::cve::importers::cve_importer::CveImporter;
 use crate::configuration::cve::endpoints::cve_endpoint::CveEndpoint;
 use crate::schema::cve::CVE;
 use crate::schema::rank::CIAScore;
+
 pub struct NessusCveImporter;
 
 #[async_trait::async_trait]
-// Implements common CVEImporter traits from cve_importer interface into NessusCveImporter for import functionality
+// Implements CVEImporter traits from cve_importer interface into NessusCveImporter for import functionality relevant to the Tenable Nessus vulnerability scanner output
 impl CveImporter for NessusCveImporter {
     async fn import(
         &self,
@@ -27,40 +29,40 @@ impl NessusCveImporter {
         file_path: String,
         endpoint: Box<dyn CveEndpoint + Send>,
     ) -> Result<Vec<CVE>, Box<dyn Error>> {
-        // Creates a CSV reader from the file path
-        let mut rdr = ReaderBuilder::new().from_path(file_path.clone())?;
+        // Creates CSV reader from the file path
+        let mut reader = ReaderBuilder::new().from_path(file_path.clone())?;
 
-        // Reads the headers to find the indices of Name and CVE columns
-        let headers = rdr.headers()?;
+        // Reader reads the headers to find the indices of Name and CVE columns
+        let headers = reader.headers()?;
         let name_index = headers
             .iter()
             .position(|h| h == "Name")
-            .ok_or("Name column not found")?;
+            .ok_or("Name column not found in headers")?;
         let id_index = headers
             .iter()
             .position(|h| h == "CVE")
-            .ok_or("CVE column not found")?;
+            .ok_or("CVE column not found in headers")?;
         let host_index = headers
             .iter()
             .position(|h| h == "Host")
-            .ok_or("Host column not found")?;
+            .ok_or("Host column not found in headers")?;
 
-        // Vector to read,store, and return CVE structs
+        // HashMap to read, store, and return the CVE structs
         let mut cves: HashMap<String, CVE> = HashMap::new();
 
-        for result in rdr.records() {
+        for result in reader.records() {
             let record = result?;
 
-            // Checks to ensure that CVE ID is present and that it is not a duplicate value before pushing to cves vector
+            // Checks to ensure that CVE ID is present and that it is not a duplicate value before pushing to cves HashMap
             if !(record.get(id_index).unwrap() == "") {
-                let name = record.get(name_index).ok_or("Missing name")?.to_string();
-                let cve_id = record.get(id_index).ok_or("Missing id")?.to_string();
+                let name = record.get(name_index).ok_or("Missing name value")?.to_string();
+                let cve_id = record.get(id_index).ok_or("Missing id value")?.to_string();
                 let host_address = record
                     .get(host_index)
-                    .ok_or("Missing host address")?
+                    .ok_or("Missing host address value")?
                     .to_string();
 
-                //if CVE already exists Apped host address to CVE
+                // If the CVE already exists, append the host address to existing CVE
                 if cves.contains_key(&cve_id) {
                     cves.get_mut(&cve_id)
                         .unwrap()
@@ -69,7 +71,6 @@ impl NessusCveImporter {
                     continue;
                 }
 
-                //TODO: DECOUPLE THIS
                 let values: CIAScore = endpoint.retrieve_cve_values(cve_id.clone()).await?;
 
                 cves.insert(

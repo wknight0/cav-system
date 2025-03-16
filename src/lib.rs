@@ -15,8 +15,17 @@ pub mod configuration {
     }
 }
 
+pub mod analysis {
+    pub mod ranking;
+}
+
+pub mod storage {
+    pub mod db_handler;
+}
+
 pub mod schema {
     pub mod cve;
     pub mod rank;
     pub mod asset;
+    pub mod storage;
 }

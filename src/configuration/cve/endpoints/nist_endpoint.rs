@@ -1,8 +1,9 @@
-use async_trait::async_trait;
-use serde_json::Value;
 use std::error::Error;
 use std::thread::sleep;
 use std::time::Duration;
+
+use async_trait::async_trait;
+use serde_json::Value;
 
 use crate::schema::rank::CIAScore;
 use crate::configuration::cve::endpoints::cve_endpoint::CveEndpoint;
@@ -19,7 +20,7 @@ impl NistEndpoint {
 
 #[async_trait]
 impl CveEndpoint for NistEndpoint {
-    // Retrieves vector string from NIST call utilizing api key and returns Values struct for CVE based on stored values
+    // Retrieves vector string from NIST call, utilizing api key provided and returns Values struct for CVE based on stored values
     async fn retrieve_cve_values(&self, cve_id: String) -> Result<CIAScore, Box<dyn Error>> {
         let client = reqwest::Client::builder().build()?;
         let request = client.request(
@@ -31,7 +32,7 @@ impl CveEndpoint for NistEndpoint {
         );
         let response = request.header("apiKey", self.key.clone()).send().await?;
 
-        // Sleep to avoid rate limiting
+        // 0.6s sleep to avoid rate limiting from Nist Endpoint
         sleep(Duration::from_secs_f32(0.6));
 
         if response.status().is_success() {

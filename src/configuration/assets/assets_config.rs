@@ -1,4 +1,5 @@
 use crate::schema::asset::Asset;
+
 pub struct AssetsList {
     assets: Vec<Asset>,
 }
@@ -11,7 +12,7 @@ impl AssetsList {
         }
     }
 
-    pub fn retrieve_assets(&self) -> &Vec<Asset> {
-        &self.assets
+    pub fn retrieve_assets(self) -> Vec<Asset> {
+        self.assets
     }
 }
