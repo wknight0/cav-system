@@ -10,6 +10,10 @@ use dotenv::dotenv;
 
 #[tokio::main]
 async fn main() {
+    tauri::Builder::default()
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+
     // Initializes storage
     if let Err(e) = db_handler::initialize_storage() {
         eprintln!("Failed to initialize storage: {}", e);
