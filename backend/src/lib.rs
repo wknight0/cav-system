@@ -1,3 +1,5 @@
+pub mod controller;
+
 pub mod configuration {
     pub mod cve {
         pub mod endpoints {

@@ -1,9 +1,9 @@
 use std::cmp::Ordering;
 
-use crate::schema::{cve::CVE, rank::RankedCVE};
+use crate::schema::{cve::CVE, asset::Asset, rank::RankedCVE};
 
 //TEMPORARY RANKING FUNCTION TO JUST ADD C, I, and A VALUES TOGETHER FOR SCORE AND SORT BY SCORE
-pub fn rank_cves(cves: Vec<CVE>) -> Vec<RankedCVE> {
+pub fn rank_cves(cves: Vec<CVE>, _assets: Vec<Asset>) -> Vec<RankedCVE> {
     let mut ranked_cves: Vec<RankedCVE> = Vec::new();
 
     for cve in cves {
