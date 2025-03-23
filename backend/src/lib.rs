@@ -12,7 +12,7 @@ pub mod configuration {
             pub mod nessus_importer;
         }
     }
-    pub mod assets {
+    pub mod network {
         pub mod assets_config;
     }
 }
