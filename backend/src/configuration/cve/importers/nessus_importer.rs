@@ -30,7 +30,9 @@ impl NessusCveImporter {
         endpoint: Box<dyn CveEndpoint + Send>,
     ) -> Result<Vec<CVE>, Box<dyn Error>> {
         // Creates CSV reader from the file path
-        let mut reader = ReaderBuilder::new().from_path(file_path.clone())?;
+        let trimmed_file_path = file_path.trim();
+        let mut reader = ReaderBuilder::new().from_path(trimmed_file_path)
+            .map_err(|e| format!("Failed to open file at '{}': {}", trimmed_file_path, e))?;
 
         // Reader reads the headers to find the indices of Name and CVE columns
         let headers = reader.headers()?;
@@ -71,7 +73,10 @@ impl NessusCveImporter {
                     continue;
                 }
 
-                let values: CIAScore = endpoint.retrieve_cve_values(cve_id.clone()).await?;
+                let values: CIAScore = endpoint
+                    .retrieve_cve_values(cve_id.to_string())
+                    .await
+                    .map_err(|e| format!("Failed to fetch CVEs for {}: {}", cve_id, e))?;
 
                 cves.insert(
                     cve_id.clone(),

@@ -56,27 +56,24 @@
 
     Button {
         width: 33.33%;
-
     }
 
     .p-button {
         border-radius: 0 !important;
         border: 0 !important;
-        color: white !important;
-        background-color: #18181b !important;
-        border-bottom: #18181b 2px solid !important;
+        color: var(--primary-text-color) !important;
+        background-color: var(--primary-color) !important;
+        border-bottom: var(--primary-color) 2px solid !important;
         font-weight: bold;
     }
 
     .view-button:hover {
-        background-color: #18181b !important;
-        color: white !important;
-        border-bottom: #6ee7b7 2px solid !important;
+        border-bottom: var(--secondary-color) 2px solid !important;
     }
 
     .active-button {
-        background-color: #6ee7b7 !important;
-        border-bottom: #6ee7b7 2px solid !important;
-        color: black !important;
+        background-color: var(--secondary-color) !important;
+        border-bottom: var(--secondary-color) 2px solid !important;
+        color: var(--secondary-text-color) !important;
     }
 </style>

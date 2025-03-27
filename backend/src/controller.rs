@@ -158,32 +158,35 @@ pub async fn update_cves(file_path: String) -> Result<(), Box<dyn Error>> {
         Ok(credentials) => credentials.nist_key,
         Err(e) => {
             eprintln!("Failed to retrieve credentials: {}", e);
-            return Err(e);
+            return Err(e.into());
         }
     };
 
     let endpoint = NistEndpoint::new(nist_key);
 
     // Import CVE from REST API calls and CSV file
-    let cve_import_results = match importer.import(file_path.clone(), Box::new(endpoint)).await {
-        Ok(results) => results,
-        Err(e) => {
+    let cve_import_results = importer
+        .import(file_path.clone(), Box::new(endpoint))
+        .await
+        .map_err(|e| {
             eprintln!("Failed to import CVEs from file {}: {}", file_path, e);
-            return Err(e);
-        }
-    };
+            e
+        })?;
+    
+    if cve_import_results.is_empty() {
+        let error_message = format!("No CVEs were imported from file {}", file_path);
+        eprintln!("{}", error_message);
+        return Err(error_message.into());
+    }
 
     // Update CVE vector in local database
-    match db_handler::update_cves(cve_import_results.clone()) {
-        Ok(_) => {
-            println!("CVE results saved successfully...");
-            Ok(())
-        }
-        Err(e) => {
-            eprintln!("Failed to save CVE results into local database: {}", e);
-            Err(e)
-        }
-    }
+    db_handler::update_cves(cve_import_results.clone()).map_err(|e| {
+        eprintln!("Failed to save CVE results into local database: {}", e);
+        e
+    })?;
+
+    println!("CVE results saved successfully...");
+    Ok(())
 }
 
 // Updates assets for the local storage
