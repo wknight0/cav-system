@@ -1,5 +1,5 @@
 use cav_system::controller;
-use cav_system::schema::asset::Asset;
+use cav_system::schema::asset::{Asset, Connection};
 use cav_system::schema::cve::CVE;
 use cav_system::schema::rank::RankedCVE;
 use cav_system::schema::storage::Credentials;
@@ -35,6 +35,15 @@ async fn remove_cves() -> bool {
 #[tauri::command]
 async fn remove_assets() -> bool {
     match controller::remove_assets().await {
+        Ok(_results) => true,
+        Err(_e) => false
+    }
+}
+
+// Tauri command to remove connections using controller
+#[tauri::command]
+async fn remove_connections() -> bool {
+    match controller::remove_connections().await {
         Ok(_results) => true,
         Err(_e) => false
     }
@@ -76,6 +85,15 @@ async fn retrieve_assets() -> Result<Vec<Asset>, String> {
     }
 }
 
+// Tauri command to retrieve connections using controller
+#[tauri::command]
+async fn retrieve_connections() -> Result<Vec<Connection>, String> {
+    match controller::retrieve_connections().await {
+        Ok(connections) => Ok(connections),
+        Err(e) => Err(format!("Failed to retrieve connections: {}", e)),
+    }
+}
+
 // Tauri command to retrieve ranked cves using controller
 #[tauri::command]
 async fn retrieve_ranked_cves() -> Result<Vec<RankedCVE>, String> {
@@ -112,6 +130,15 @@ async fn update_assets(assets: Vec<Asset>) -> bool {
     }
 }
 
+// Tauri command to update connections using controller
+#[tauri::command]
+async fn update_connections(connections: Vec<Connection>) -> bool {
+    match controller::update_connections(connections).await {
+        Ok(_results) => true,
+        Err(_e) => false
+    }
+}
+
 // Tauri command to update ranked cves using controller
 #[tauri::command]
 async fn update_ranked_cves() -> bool {
@@ -129,14 +156,17 @@ async fn main() {
             remove_credentials,
             remove_cves,
             remove_assets,
+            remove_connections,
             remove_ranked_cves,
             retrieve_credentials,
             retrieve_cves,
             retrieve_assets,
+            retrieve_connections,
             retrieve_ranked_cves,
             update_credentials,
             update_cves,
             update_assets,
+            update_connections,
             update_ranked_cves
         ])
         .run(tauri::generate_context!())

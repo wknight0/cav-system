@@ -3,16 +3,22 @@ use serde::{Deserialize, Serialize};
 // Asset struct holds asset type, ip address, and properties for context in the network
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Asset {
+    pub _id: String,
+    pub label: String,
     pub asset_type: AssetType,
+    pub position: Position,
     pub ip_address: String,
     pub properties: Properties,
 }
 
 impl Asset {
     // Constructor for the Asset struct
-    pub fn new(asset_type: AssetType, ip_address: String, properties: Properties) -> Self {
+    pub fn new(_id: String, label: String, asset_type: AssetType, position: Position, ip_address: String, properties: Properties) -> Self {
         Asset {
+            _id,
+            label,
             asset_type,
+            position,
             ip_address,
             properties,
         }
@@ -38,6 +44,13 @@ pub enum AssetType {
     Laptop,
     MobileDevice,
     IoTDevice,
+}
+
+// Position struct which holds where the asset is located on topology
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Position {
+    pub x: u32,
+    pub y: u32,
 }
 
 // Properties struct which holds contextual variables relevant to the asset
@@ -73,5 +86,26 @@ impl Properties {
 
     pub fn retrieve_internet_facing(&self) -> &str {
         &self.internet_facing
+    }
+}
+
+// Connection struct holds links between assets in the network
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Connection {
+    pub _id: String,
+    pub connection_type: String,
+    pub source: String,
+    pub destination: String,
+}
+
+impl Connection {
+    // Constructor for the Connection struct
+    pub fn new(_id: String, connection_type: String, source: String, destination: String) -> Self {
+        Connection {
+            _id,
+            connection_type,
+            source,
+            destination,
+        }
     }
 }

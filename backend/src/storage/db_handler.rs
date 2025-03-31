@@ -6,7 +6,7 @@ use bson::to_bson;
 use polodb_core::bson::doc;
 use polodb_core::Database;
 
-use crate::schema::asset::Asset;
+use crate::schema::asset::{Asset, Connection};
 use crate::schema::cve::CVE;
 use crate::schema::rank::RankedCVE;
 use crate::schema::storage::{Storage, Credentials};
@@ -31,6 +31,7 @@ pub fn initialize_storage() -> Result<(), Box<dyn std::error::Error>> {
             credentials: Credentials::new("".to_string()),
             cves: Vec::new(),
             assets: Vec::new(),
+            connections: Vec::new(),
             ranked_cves: Vec::new(),
         };
         collection.insert_one(storage)?;
@@ -80,6 +81,22 @@ pub fn remove_assets() -> Result<(), Box<dyn std::error::Error>> {
 
     if let Some(_) = collection.find_one(filter.clone())? {
         collection.update_one(filter, doc! { "$unset": { "assets": "" } })?;
+        Ok(())
+    } else {
+        Err(Box::from("Storage not found..."))
+    }
+}
+
+// Removes connections from the local storage
+pub fn remove_connections() -> Result<(), Box<dyn std::error::Error>> {
+    let db_path = String::from("./cache_storage/local");
+    let db = Database::open_file(db_path)?;
+    let collection = db.collection::<Storage>("local");
+
+    let filter = doc! { "key": "local" };
+
+    if let Some(_) = collection.find_one(filter.clone())? {
+        collection.update_one(filter, doc! { "$unset": { "connections": "" } })?;
         Ok(())
     } else {
         Err(Box::from("Storage not found..."))
@@ -144,6 +161,20 @@ pub fn retrieve_assets() -> Result<Vec<Asset>, Box<dyn std::error::Error>> {
         Ok(storage.assets)
     } else {
         Err(Box::from("Storage not found when retrieving assets..."))
+    }
+}
+
+pub fn retrieve_connections() -> Result<Vec<Connection>, Box<dyn std::error::Error>> {
+    let db_path = String::from("./cache_storage/local");
+    let db = Database::open_file(db_path)?;
+    let collection = db.collection::<Storage>("local");
+
+    let filter = doc! { "key": "local" };
+
+    if let Some(storage) = collection.find_one(filter)? {
+        Ok(storage.connections)
+    } else {
+        Err(Box::from("Storage not found when retrieving connections..."))
     }
 }
 
@@ -240,6 +271,32 @@ pub fn update_assets(assets: Vec<Asset>) -> Result<(), Box<dyn Error>> {
         doc! { "$set": { "assets": assets_bson } },
     ).map_err(|e| {
         eprintln!("Failed to update assets: {}", e);
+        Box::new(e) as Box<dyn Error>
+    })?;
+
+    Ok(())
+}
+
+pub fn update_connections(connections: Vec<Connection>) -> Result<(), Box<dyn Error>> {
+    let db_path = String::from("./cache_storage/local");
+
+    let db = Database::open_file(db_path).map_err(|e| {
+        eprintln!("Failed to open database: {}", e);
+        Box::new(e) as Box<dyn Error>
+    })?;
+
+    let collection = db.collection::<Storage>("local");
+
+    let connections_bson = to_bson(&connections).map_err(|e| {
+        eprintln!("Failed to convert connections to BSON: {}", e);
+        Box::new(e) as Box<dyn Error>
+    })?;
+
+    collection.update_one(
+        doc! { "key": "local" },
+        doc! { "$set": { "connections": connections_bson } },
+    ).map_err(|e| {
+        eprintln!("Failed to update connections: {}", e);
         Box::new(e) as Box<dyn Error>
     })?;
 

@@ -83,6 +83,7 @@
 
 <script setup>
     import { ref, markRaw, watch } from 'vue';
+    import { invoke } from '@tauri-apps/api/tauri';
     import { VueFlow, useVueFlow } from '@vue-flow/core';
     import '@vue-flow/core/dist/style.css';
     import { Button } from 'primevue';
@@ -91,9 +92,9 @@
     import { createWirelessEdge } from './Assets/Edges/WirelessEdge.vue';
 
     const { fitView } = useVueFlow();
-    
+
     const nodeTypes = {
-        router: markRaw(RouterNode),
+        Router: markRaw(RouterNode),
     }
 
     const nodes = ref([]);
@@ -117,7 +118,7 @@
 
         const newRouterNode = {
             id,
-            type: 'router',
+            type: 'Router',
             position,
             data: {
                 label,
@@ -153,8 +154,6 @@
         selectedConnectionType.value = null;
     };
 
-    
-
     const onConnectStart = () => {
         console.log('Connection started');
     };
@@ -168,16 +167,65 @@
         edges.value = [];
     };
 
-    const updateNetwork = async () => {
-        console.log("Temporary update network functionality...");
+    const loadNetwork = async () => {
+        let assets;
+        let connections; 
+
+        try {
+            assets = await invoke('retrieve_assets');
+            connections = await invoke('retrieve_connections');
+        } catch (error) {
+            console.error(error);
+        }
+
+        console.log(assets);
+        console.log(connections);
     }
 
+    const updateNetwork = async () => {
+        const assetData = nodes.value.map(node => ({
+            _id: node.id,
+            label: node.data.label,
+            asset_type: node.type,
+            position: node.position,
+            ip_address: '192.168.1.1',
+            properties: node.data.properties || {
+                firewall_status: 'unknown',
+                internet_facing: 'unknown',
+                relations: [],
+            },
+        }));
+
+        const connectionData = edges.value.map(edge => ({
+            _id: edge.id,
+            connection_type: edge.type,
+            source: edge.source,
+            target: edge.target,
+        }));
+
+        console.log(nodes);
+        console.log(edges);
+
+        console.log(assetData);
+
+        try {
+            await invoke('update_assets', {
+                assets: assetData,
+            });
+            await invoke('update_connections', {
+                connections: connectionData,
+            })
+
+            console.log('Network data successfully stored...');
+        } catch (error) {
+            console.error(error);
+        }
+    }    
     
+    loadNetwork();
 </script>
 
 <style>
-    
-
     .network {
         height: 100%;
         width: 100%;

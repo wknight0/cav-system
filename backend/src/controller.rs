@@ -5,7 +5,7 @@ use crate::configuration::cve::importers::nessus_importer::NessusCveImporter;
 use crate::configuration::cve::endpoints::nist_endpoint::NistEndpoint;
 use crate::schema::storage::Credentials;
 use crate::schema::cve::CVE;
-use crate::schema::asset::Asset;
+use crate::schema::asset::{Asset, Connection};
 use crate::schema::rank::RankedCVE;
 use crate::storage::db_handler;
 
@@ -69,6 +69,19 @@ pub async fn remove_assets() -> Result<(), Box<dyn Error>> {
     }
 }
 
+pub async fn remove_connections() -> Result<(), Box<dyn Error>> {
+    match db_handler::remove_connections() {
+        Ok(_) => {
+            println!("Connections removed successfully...");
+            Ok(())
+        }
+        Err(e) => {
+            eprintln!("Failed to remove connections: {}", e);
+            Err(e)
+        }
+    }
+}
+
 pub async fn remove_ranked_cves() -> Result<(), Box<dyn Error>> {
     match db_handler::remove_ranked_cves() {
         Ok(_) => {
@@ -117,6 +130,19 @@ pub async fn retrieve_assets() -> Result<Vec<Asset>, Box<dyn Error>> {
         }
         Err(e) => {
             eprintln!("Failed to retrieve assets: {}", e);
+            Err(e)
+        }
+    }
+}
+
+pub async fn retrieve_connections() -> Result<Vec<Connection>, Box<dyn Error>> {
+    match db_handler::retrieve_connections() {
+        Ok(connections) => {
+            println!("Connections retrieved successfully...");
+            Ok(connections)
+        }
+        Err(e) => {
+            eprintln!("Failed to retrieve connections: {}", e);
             Err(e)
         }
     }
@@ -198,6 +224,20 @@ pub async fn update_assets(assets: Vec<Asset>) -> Result<(), Box<dyn Error>> {
         }
         Err(e) => {
             eprintln!("Failed to save asset results into local database: {}", e);
+            Err(e)
+        }
+    }
+}
+
+// Updates connections for the local storage
+pub async fn update_connections(connections: Vec<Connection>) -> Result<(), Box<dyn Error>> {
+    match db_handler::update_connections(connections) {
+        Ok(_) => {
+            println!("Connection results saved successfully...");
+            Ok(())
+        }
+        Err(e) => {
+            eprintln!("Failed to save connection results into local database: {}", e);
             Err(e)
         }
     }
