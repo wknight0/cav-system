@@ -4,6 +4,7 @@
             id: edgeId,
             ...params,
             type: 'straight',
+            connection_type: 'wireless',
             animated: false,
             style: {
                 stroke: 'var(--secondary-color)',

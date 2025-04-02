@@ -12,6 +12,8 @@
                 @connect="onConnect"
                 @connect-start="onConnectStart"
                 @connect-stop="onConnectStop"
+                @edges-delete="onEdgesDelete"
+                @nodes-delete="onNodesDelete"
             />
             <div class="network-palette">
                 <div class="button-section top-section">
@@ -38,11 +40,11 @@
                 <div class="button-section bottom-section">
                     <h3 class="section-title">Nodes</h3>
                     <div class="icon-button-grid bottom-buttons">
-                        <Button class="icon-button" @click="addRouterNode">
-                            <img src="../assets/icons/router.svg" alt="Router" />
-                            <label>Router</label>
+                        <Button class="icon-button" @click="addNode('Switch')">
+                            <img src="../assets/icons/switch.svg" alt="Switch" />
+                            <label>Switch</label>
                         </Button>
-                        <Button class="icon-button">
+                        <Button class="icon-button" @click="addNode('Router')">
                             <img src="../assets/icons/router.svg" alt="Router" />
                             <label>Router</label>
                         </Button>
@@ -87,6 +89,7 @@
     import { VueFlow, useVueFlow } from '@vue-flow/core';
     import '@vue-flow/core/dist/style.css';
     import { Button } from 'primevue';
+    import SwitchNode from './Assets/Nodes/SwitchNode.vue';
     import RouterNode from './Assets/Nodes/RouterNode.vue';
     import { createEthernetEdge } from './Assets/Edges/EthernetEdge.vue';
     import { createWirelessEdge } from './Assets/Edges/WirelessEdge.vue';
@@ -94,6 +97,7 @@
     const { fitView } = useVueFlow();
 
     const nodeTypes = {
+        Switch: markRaw(SwitchNode),
         Router: markRaw(RouterNode),
     }
 
@@ -111,14 +115,14 @@
         selectedConnectionType.value = selectedConnectionType.value === type ? null : type;
     };
 
-    const addRouterNode = () => {
+    const addNode = (nodeType) => {
         const id = `node-${nodes.value.length + 1}`;
         const position = { x: 300, y: 200 };
-        const label = `Router ${nodes.value.length + 1}`;
+        const label = `Node ${nodes.value.length + 1}`;
 
-        const newRouterNode = {
+        const newNode = {
             id,
-            type: 'Router',
+            type: nodeType,
             position,
             data: {
                 label,
@@ -126,12 +130,10 @@
             },
         };
 
-        nodes.value.push(newRouterNode);
+        nodes.value.push(newNode);
     };
 
     const onConnect = (params) => {
-        console.log('Connection Params:', params);
-
         const edgeId = `edge-${edges.value.length + 1}`;
         let newEdge;
 
@@ -153,6 +155,17 @@
 
         selectedConnectionType.value = null;
     };
+
+    const onEdgesDelete = (deletedEdges) => {
+        edges.value = edges.value.filter(edge => !deletedEdges.some(deletedEdge => deletedEdge.id === edge.id));
+    };
+
+    const onNodesDelete = (deletedNodes) => {
+        nodes.value = nodes.value.filter(node => !deletedNodes.some(deletedNode => deletedNode.id === node.id));
+        edges.value = edges.value.filter(edge => 
+            !deletedNodes.some(deletedNode => edge.source === deletedNode.id || edge.target === deletedNode.id)
+        );
+    }
 
     const onConnectStart = () => {
         console.log('Connection started');
@@ -176,10 +189,41 @@
             connections = await invoke('retrieve_connections');
         } catch (error) {
             console.error(error);
+            return;
         }
 
-        console.log(assets);
-        console.log(connections);
+        nodes.value = assets.map(asset => ({
+            id: asset._id,
+            type: asset.asset_type,
+            position: asset.position,
+            data: {
+                label: asset.label,
+                properties: asset.properties,
+                showHandles: false,
+            },
+        }));
+
+        edges.value = connections.map(connection => {
+            const edgeId = connection._id;
+
+            switch (connection.connection_type) {
+                case ('ethernet'):
+                    return createEthernetEdge(
+                        { source: connection.source, target: connection.destination },
+                        edgeId
+                    );
+                case ('wireless'):
+                    return createWirelessEdge(
+                        { source: connection.source, target:connection.destination },
+                        edgeId
+                    );
+                default:
+                    console.warn("Unknown connection type...");
+                    return null;
+            }
+        }).filter(edge => edge !== null);
+
+        console.log('Network loaded...');
     }
 
     const updateNetwork = async () => {
@@ -198,15 +242,11 @@
 
         const connectionData = edges.value.map(edge => ({
             _id: edge.id,
-            connection_type: edge.type,
             source: edge.source,
-            target: edge.target,
+            destination: edge.target,
+            type: edge.type,
+            connection_type: edge.connection_type,
         }));
-
-        console.log(nodes);
-        console.log(edges);
-
-        console.log(assetData);
 
         try {
             await invoke('update_assets', {
