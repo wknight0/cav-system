@@ -37,20 +37,24 @@ impl Asset {
 // Asset type enum which holds the different types of assets in the network
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum AssetType {
-    Router,
     Switch,
+    Router,
+    Firewall,
+    LoadBalancer,
     Server,
+    Storage,
     Desktop,
     Laptop,
     MobileDevice,
+    Printer,
     IoTDevice,
 }
 
 // Position struct which holds where the asset is located on topology
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Position {
-    pub x: u32,
-    pub y: u32,
+    pub x: f32,
+    pub y: f32,
 }
 
 // Properties struct which holds contextual variables relevant to the asset

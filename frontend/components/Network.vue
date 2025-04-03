@@ -41,36 +41,48 @@
                     <h3 class="section-title">Nodes</h3>
                     <div class="icon-button-grid bottom-buttons">
                         <Button class="icon-button" @click="addNode('Switch')">
-                            <img src="../assets/icons/switch.svg" alt="Switch" />
+                            <img src="../assets/icons/switch.svg" alt="Switch Icon" />
                             <label>Switch</label>
                         </Button>
                         <Button class="icon-button" @click="addNode('Router')">
-                            <img src="../assets/icons/router.svg" alt="Router" />
+                            <img src="../assets/icons/router.svg" alt="Router Icon" />
                             <label>Router</label>
                         </Button>
-                        <Button class="icon-button">
-                            <img src="../assets/icons/router.svg" alt="Router" />
-                            <label>Router</label>
+                        <Button class="icon-button" @click="addNode('Firewall')">
+                            <img src="../assets/icons/firewall.svg" alt="Firewall Icon" />
+                            <label>Firewall</label>
                         </Button>
-                        <Button class="icon-button">
-                            <img src="../assets/icons/router.svg" alt="Router" />
-                            <label>Router</label>
+                        <Button class="icon-button" @click="addNode('LoadBalancer')">
+                            <img src="../assets/icons/loadbalancer.svg" alt="LoadBalancer Icon" />
+                            <label>LoadBalancer</label>
                         </Button>
-                        <Button class="icon-button">
-                            <img src="../assets/icons/router.svg" alt="Router" />
-                            <label>Router</label>
+                        <Button class="icon-button" @click="addNode('Server')">
+                            <img src="../assets/icons/server.svg" alt="Server Icon" />
+                            <label>Server</label>
                         </Button>
-                        <Button class="icon-button">
-                            <img src="../assets/icons/router.svg" alt="Router" />
-                            <label>Router</label>
+                        <Button class="icon-button" @click="addNode('Storage')">
+                            <img src="../assets/icons/storage.svg" alt="Storage Icon" />
+                            <label>Storage</label>
                         </Button>
-                        <Button class="icon-button">
-                            <img src="../assets/icons/router.svg" alt="Router" />
-                            <label>Router</label>
+                        <Button class="icon-button" @click="addNode('Desktop')">
+                            <img src="../assets/icons/wiredclient.svg" alt="Desktop Icon" />
+                            <label>Desktop</label>
                         </Button>
-                        <Button class="icon-button">
-                            <img src="../assets/icons/router.svg" alt="Router" />
-                            <label>Router</label>
+                        <Button class="icon-button" @click="addNode('Laptop')">
+                            <img src="../assets/icons/wirelessclient.svg" alt="Laptop Icon" />
+                            <label>Laptop</label>
+                        </Button>
+                        <Button class="icon-button" @click="addNode('MobileDevice')">
+                            <img src="../assets/icons/wirelessphone.svg" alt="MobileDevice Icon" />
+                            <label>MobileDevice</label>
+                        </Button>
+                        <Button class="icon-button" @click="addNode('Printer')">
+                            <img src="../assets/icons/printer.svg" alt="Printer Icon" />
+                            <label>Printer</label>
+                        </Button>
+                        <Button class="icon-button" @click="addNode('IoTDevice')">
+                            <img src="../assets/icons/iotdevice.svg" alt="IoTDevice Icon" />
+                            <label>IoTDevice</label>
                         </Button>
                     </div>
                 </div>
@@ -91,6 +103,15 @@
     import { Button } from 'primevue';
     import SwitchNode from './Assets/Nodes/SwitchNode.vue';
     import RouterNode from './Assets/Nodes/RouterNode.vue';
+    import FirewallNode from './Assets/Nodes/FirewallNode.vue';
+    import LoadBalancerNode from './Assets/Nodes/LoadBalancerNode.vue';
+    import ServerNode from './Assets/Nodes/ServerNode.vue';
+    import StorageNode from './Assets/Nodes/StorageNode.vue';
+    import DesktopNode from './Assets/Nodes/DesktopNode.vue';
+    import LaptopNode from './Assets/Nodes/LaptopNode.vue';
+    import MobileDeviceNode from './Assets/Nodes/MobileDeviceNode.vue';
+    import PrinterNode from './Assets/Nodes/PrinterNode.vue';
+    import IoTDeviceNode from './Assets/Nodes/IoTDeviceNode.vue';
     import { createEthernetEdge } from './Assets/Edges/EthernetEdge.vue';
     import { createWirelessEdge } from './Assets/Edges/WirelessEdge.vue';
 
@@ -99,6 +120,15 @@
     const nodeTypes = {
         Switch: markRaw(SwitchNode),
         Router: markRaw(RouterNode),
+        Firewall: markRaw(FirewallNode),
+        LoadBalancer: markRaw(LoadBalancerNode),
+        Server: markRaw(ServerNode),
+        Storage: markRaw(StorageNode),
+        Desktop: markRaw(DesktopNode),
+        Laptop: markRaw(LaptopNode),
+        MobileDevice: markRaw(MobileDeviceNode),
+        Printer: markRaw(PrinterNode),
+        IoTDevice: markRaw(IoTDeviceNode),
     }
 
     const nodes = ref([]);
@@ -347,7 +377,7 @@
     }
 
     .icon-button label {
-        font-size: 0.8rem;
+        font-size: 0.6rem;
         color: var(--primary-text-color);
         text-align: center;
     }
