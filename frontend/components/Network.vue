@@ -146,21 +146,32 @@
     };
 
     const addNode = (nodeType) => {
-        const id = `node-${nodes.value.length + 1}`;
-        const position = { x: 300, y: 200 };
-        const label = `Node ${nodes.value.length + 1}`;
+        try {
+            const typeCount = nodes.value.filter(n => n.type === nodeType).length;
+            const id = `${nodeType.toLowerCase()}-${typeCount + 1}`;
+            const position = { x: 300, y: 200 };
+            const label = `${nodeType} ${typeCount + 1}`;
 
-        const newNode = {
-            id,
-            type: nodeType,
-            position,
-            data: {
-                label,
-                showHandles: !!selectedConnectionType.value,
-            },
-        };
+            const newNode = {
+                id,
+                type: nodeType,
+                position,
+                data: {
+                    label,
+                    showHandles: !!selectedConnectionType.value,
+                    ip_address: '',
+                    properties: {
+                        firewall_status: '',
+                        internet_facing: '',
+                    },
+                },
+            };
 
         nodes.value.push(newNode);
+        } catch (error) {
+            console.error('Error adding node:', error);
+            return;
+        }
     };
 
     const onConnect = (params) => {
@@ -228,8 +239,12 @@
             position: asset.position,
             data: {
                 label: asset.label,
-                properties: asset.properties,
                 showHandles: false,
+                ip_address: asset.ip_address,
+                properties: {
+                    firewall_status: asset.properties.firewall_status,
+                    internet_facing: asset.properties.internet_facing,
+                }
             },
         }));
 
@@ -262,11 +277,10 @@
             label: node.data.label,
             asset_type: node.type,
             position: node.position,
-            ip_address: '192.168.1.1',
-            properties: node.data.properties || {
-                firewall_status: 'unknown',
-                internet_facing: 'unknown',
-                relations: [],
+            ip_address: node.data.ip_address,
+            properties: {
+                firewall_status: node.data.properties.firewall_status,
+                internet_facing: node.data.properties.internet_facing,
             },
         }));
 

@@ -60,36 +60,29 @@ pub struct Position {
 // Properties struct which holds contextual variables relevant to the asset
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Properties {
-    pub relations: Vec<String>,
     pub firewall_status: String,
-    pub internet_facing: String,
+    pub internet_facing: bool,
 }
 
 impl Properties {
     // Constructor for the Properties struct
     pub fn new(
-        relations: Vec<String>,
         firewall_status: String,
-        internet_facing: String,
+        internet_facing: bool,
     ) -> Properties {
         Properties {
-            relations,
             firewall_status,
             internet_facing,
         }
     }
 
     // Get methods for individual fields
-    pub fn retrieve_relations(&self) -> Vec<String> {
-        self.relations.clone()
-    }
-
     pub fn retrieve_firewall_status(&self) -> &str {
         &self.firewall_status
     }
 
-    pub fn retrieve_internet_facing(&self) -> &str {
-        &self.internet_facing
+    pub fn retrieve_internet_facing(self) -> bool {
+        self.internet_facing
     }
 }
 
