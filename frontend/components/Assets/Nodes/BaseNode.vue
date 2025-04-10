@@ -1,5 +1,6 @@
 <template>
     <div class="base-node">
+        <!-- Handle for connections -->
         <Handle
             type="target"
             :position="Position.Left"
@@ -16,6 +17,7 @@
         />
         <img class="node-background node-icon" :src="icon" alt="Node Icon" @click="openProperties"/>
         <div class="node-label">{{ data.label }}</div>
+        <!-- Handle for connections -->
         <Handle
             type="source"
             :position="Position.Right"
@@ -30,6 +32,7 @@
                 zIndex: data.showHandles ? 10 : 0
             }"
         />
+        <!-- Properties dialog which stores common asset attributes and can store additional property information via slot component -->
         <Dialog 
             v-model:visible="showPopup" 
             :modal="true" 
@@ -47,29 +50,9 @@
                     <label for="ipAddress">IP Address:</label>
                     <InputText id="ipAddress" v-model="data.ip_address" placeholder="Enter IP address" class="input-field" />
                 </div>
-
-                <div class="form-group radio-group">
-                    <label for="firewallStatus">Firewall Status:</label>
-                    <label v-for="option in firewallOptions" :key="option.value">
-                        <RadioButton 
-                            :value="option.value" 
-                            v-model="data.properties.firewall_status" 
-                        />
-                        {{ option.label }}
-                    </label>
-                </div>
-
-                <div class="form-group radio-group">
-                    <label for="internetFacing">Internet Facing:</label>
-                    <label v-for="option in internetFacingOptions" :key="option.value" >
-                        <RadioButton 
-                            :value="option.value" 
-                            v-model="data.properties.internet_facing" 
-                        />
-                        {{ option.label }}
-                    </label>
-                </div>
             </div>
+            <br>
+            <slot></slot>
         </Dialog>
     </div>
 </template>
@@ -77,22 +60,11 @@
 <script setup>
     import { ref } from 'vue';
     import { Handle, Position } from '@vue-flow/core';
-    import { Dialog, InputText, RadioButton } from 'primevue';
+    import { Dialog, InputText } from 'primevue';
 
     defineProps(['data', 'icon', 'showHandles']);
 
     const showPopup = ref(false);
-
-    const firewallOptions = [
-        { label: 'Active', value: 'active' },
-        { label: 'Inactive', value: 'inactive' },
-        { label: 'Unknown', value: 'unknown' },
-    ];
-
-    const internetFacingOptions = [
-        { label: 'Yes', value: true },
-        { label: 'No', value: false },
-    ];
 
     const openProperties = () => {
         showPopup.value = true;
@@ -130,12 +102,6 @@
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
-    }
-
-    .radio-group {
-        display: flex;
-        flex-direction: row;
-        gap: 0.5rem;
     }
 
     .input-field {

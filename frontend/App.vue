@@ -23,7 +23,9 @@
     --primary-color: #18181b;
     --primary-text-color: white;
     --secondary-color: #6ee7b7;
-    --secondary-text-color: black; 
+    --secondary-text-color: black;
+    --tertiary-color: #09090b;
+    --warning-color: rgb(177, 51, 51);
   }
 
   body {

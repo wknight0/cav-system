@@ -60,29 +60,99 @@ pub struct Position {
 // Properties struct which holds contextual variables relevant to the asset
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Properties {
+    pub operating_system: String,
+    pub internet_facing: String,
     pub firewall_status: String,
-    pub internet_facing: bool,
+    pub firmware_status: String,
+    pub tamper_detection_status: String,
+    pub vpn_support: String,
+    pub vlan_support: String,
+    pub poe_support: String,
+    pub encryption_enabled: String,
+    pub virtualization_enabled: String,
+    pub network_enabled: String,
+    pub health_check_enabled: String,
 }
 
 impl Properties {
     // Constructor for the Properties struct
     pub fn new(
+        operating_system: String,
+        internet_facing: String,
         firewall_status: String,
-        internet_facing: bool,
+        firmware_status: String,
+        tamper_detection_status: String,
+        vpn_support: String,
+        vlan_support: String,
+        poe_support: String,
+        encryption_enabled: String,
+        virtualization_enabled: String,
+        network_enabled: String,
+        health_check_enabled: String,
     ) -> Properties {
         Properties {
-            firewall_status,
+            operating_system,
             internet_facing,
+            firewall_status,
+            firmware_status,
+            tamper_detection_status,
+            vpn_support,
+            vlan_support,
+            poe_support,
+            encryption_enabled,
+            virtualization_enabled,
+            network_enabled,
+            health_check_enabled,
         }
     }
 
     // Get methods for individual fields
+    pub fn retrieve_operating_system(&self) -> &str {
+        &self.operating_system
+    }
+    
+    pub fn retrieve_internet_facing(&self) -> &str {
+        &self.internet_facing
+    }
+
     pub fn retrieve_firewall_status(&self) -> &str {
         &self.firewall_status
     }
 
-    pub fn retrieve_internet_facing(self) -> bool {
-        self.internet_facing
+    pub fn retrieve_firmware_status(&self) -> &str {
+        &self.firmware_status
+    }
+
+    pub fn retrieve_tamper_detection_status(&self) -> &str {
+        &self.tamper_detection_status
+    }
+
+    pub fn retrieve_vpn_support(&self) -> &str {
+        &self.vpn_support
+    }
+
+    pub fn retrieve_vlan_support(&self) -> &str {
+        &self.vlan_support
+    }
+
+    pub fn retrieve_poe_support(&self) -> &str {
+        &self.poe_support
+    }
+
+    pub fn retrieve_encryption_enabled(&self) -> &str {
+        &self.encryption_enabled
+    }
+
+    pub fn retrieve_virtualization_enabled(&self) -> &str {
+        &self.virtualization_enabled
+    }
+
+    pub fn retrieve_network_enabled(&self) -> &str {
+        &self.network_enabled
+    }
+
+    pub fn retrieve_health_check_enabled(&self) -> &str {
+        &self.health_check_enabled
     }
 }
 

@@ -1,12 +1,13 @@
 <template>
     <div class="network">
         <div class="network-topology-wizard">
+            <!-- Interactive topology section -->
             <VueFlow
                 v-model:nodes="nodes"
                 v-model:edges="edges"
                 :node-types="nodeTypes"
                 :fit-view="true"
-                :pan-on-drag="false"
+                :pan-on-drag="true"
                 :zoom-on-double-click="false"
                 class="vue-flow-container"
                 @connect="onConnect"
@@ -15,6 +16,7 @@
                 @edges-delete="onEdgesDelete"
                 @nodes-delete="onNodesDelete"
             />
+            <!-- Network topology palette section -->
             <div class="network-palette">
                 <div class="button-section top-section">
                     <h3 class="section-title">Connections</h3>
@@ -90,6 +92,7 @@
         </div>
         
         <div class="button-container">
+            <Button @click="clearNetwork" class="clear-button">Clear Network</Button>
             <Button @click="updateNetwork" class="update-button">Update Network</Button>
         </div>
     </div>
@@ -100,7 +103,7 @@
     import { invoke } from '@tauri-apps/api/tauri';
     import { VueFlow, useVueFlow } from '@vue-flow/core';
     import '@vue-flow/core/dist/style.css';
-    import { Button } from 'primevue';
+    import { Button, Dialog } from 'primevue';
     import SwitchNode from './Assets/Nodes/SwitchNode.vue';
     import RouterNode from './Assets/Nodes/RouterNode.vue';
     import FirewallNode from './Assets/Nodes/FirewallNode.vue';
@@ -145,6 +148,7 @@
         selectedConnectionType.value = selectedConnectionType.value === type ? null : type;
     };
 
+    // Adds a new node to the network topology
     const addNode = (nodeType) => {
         try {
             const typeCount = nodes.value.filter(n => n.type === nodeType).length;
@@ -156,13 +160,24 @@
                 id,
                 type: nodeType,
                 position,
+                // Data contains default values for the node and is modified only where relevant depending on the node type
                 data: {
                     label,
                     showHandles: !!selectedConnectionType.value,
                     ip_address: '',
                     properties: {
-                        firewall_status: '',
-                        internet_facing: '',
+                        operating_system: 'unknown',
+                        internet_facing: 'unknown',
+                        firewall_status: 'unknown',
+                        firmware_status: 'unknown',
+                        tamper_detection_status: 'unknown',
+                        vpn_support: 'unknown',
+                        vlan_support: 'unknown',
+                        poe_support: 'unknown',
+                        encryption_enabled: 'unknown',
+                        virtualization_enabled: 'unknown',
+                        network_enabled: 'unknown',
+                        health_check_enabled: 'unknown',
                     },
                 },
             };
@@ -174,6 +189,7 @@
         }
     };
 
+    // onConnect attribute for connecting nodes together for Vue Flow
     const onConnect = (params) => {
         const edgeId = `edge-${edges.value.length + 1}`;
         let newEdge;
@@ -197,10 +213,12 @@
         selectedConnectionType.value = null;
     };
 
+    // Handles deletion of the Vue Flow edges
     const onEdgesDelete = (deletedEdges) => {
         edges.value = edges.value.filter(edge => !deletedEdges.some(deletedEdge => deletedEdge.id === edge.id));
     };
 
+    // Handles deletion of the Vue Flow nodes
     const onNodesDelete = (deletedNodes) => {
         nodes.value = nodes.value.filter(node => !deletedNodes.some(deletedNode => deletedNode.id === node.id));
         edges.value = edges.value.filter(edge => 
@@ -208,6 +226,7 @@
         );
     }
 
+    // Handles connection start and stop events
     const onConnectStart = () => {
         console.log('Connection started');
     };
@@ -216,11 +235,7 @@
         console.log('Connection stopped');
     };
 
-    const clearTopology = () => {
-        nodes.value = [];
-        edges.value = [];
-    };
-
+    // Load the network topology from the database
     const loadNetwork = async () => {
         let assets;
         let connections; 
@@ -242,8 +257,18 @@
                 showHandles: false,
                 ip_address: asset.ip_address,
                 properties: {
-                    firewall_status: asset.properties.firewall_status,
+                    operating_system: asset.properties.operating_system,
                     internet_facing: asset.properties.internet_facing,
+                    firewall_status: asset.properties.firewall_status,
+                    firmware_status: asset.properties.firmware_status,
+                    tamper_detection_status: asset.properties.tamper_detection_status,
+                    vpn_support: asset.properties.vpn_support,
+                    vlan_support: asset.properties.vlan_support,
+                    poe_support: asset.properties.poe_support,
+                    encryption_enabled: asset.properties.encryption_enabled,
+                    virtualization_enabled: asset.properties.virtualization_enabled,
+                    network_enabled: asset.properties.network_enabled,
+                    health_check_enabled: asset.properties.health_check_enabled,
                 }
             },
         }));
@@ -271,6 +296,13 @@
         console.log('Network loaded...');
     }
 
+    // Clears the network topology
+    const clearNetwork = async () => {
+        nodes.value = [];
+        edges.value = [];
+    };
+
+    // Updates the network topology in the database
     const updateNetwork = async () => {
         const assetData = nodes.value.map(node => ({
             _id: node.id,
@@ -279,8 +311,18 @@
             position: node.position,
             ip_address: node.data.ip_address,
             properties: {
-                firewall_status: node.data.properties.firewall_status,
+                operating_system: node.data.properties.operating_system,
                 internet_facing: node.data.properties.internet_facing,
+                firewall_status: node.data.properties.firewall_status,
+                firmware_status: node.data.properties.firmware_status,
+                tamper_detection_status: node.data.properties.tamper_detection_status,
+                vpn_support: node.data.properties.vpn_support,
+                vlan_support: node.data.properties.vlan_support,
+                poe_support: node.data.properties.poe_support,
+                encryption_enabled: node.data.properties.encryption_enabled,
+                virtualization_enabled: node.data.properties.virtualization_enabled,
+                network_enabled: node.data.properties.network_enabled,
+                health_check_enabled: node.data.properties.health_check_enabled,
             },
         }));
 
@@ -291,6 +333,8 @@
             type: edge.type,
             connection_type: edge.connection_type,
         }));
+
+        console.log('Asset Data:', assetData);
 
         try {
             await invoke('update_assets', {
@@ -340,6 +384,7 @@
         gap: 0.5rem;
         width: 150px;
         overflow: hidden scroll;
+        background-color: var(--primary-color) !important;
     }
 
     .section-title {
@@ -365,6 +410,10 @@
         margin-bottom: 15px;
     }
 
+    .button-container {
+        justify-content: space-evenly;
+    }
+
     .icon-button {
         width: 60px;
         height: 80px;
@@ -388,6 +437,11 @@
     .update-button:hover {
         color: var(--secondary-text-color) !important;
         background-color: var(--secondary-color) !important;
+    }
+
+    .clear-button:hover {
+        color: var(--secondary-text-color) !important;
+        background-color: var(--warning-color) !important;
     }
 
     .icon-button label {
