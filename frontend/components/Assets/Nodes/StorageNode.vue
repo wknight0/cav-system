@@ -21,6 +21,7 @@
 <script setup>
     import BaseNode from './BaseNode.vue';
     import storageIcon from '../../../assets/icons/storage.svg';
+    import { RadioButton } from 'primevue';
 
     const encryptionOptions = [
         { label: 'Yes', value: 'yes' },

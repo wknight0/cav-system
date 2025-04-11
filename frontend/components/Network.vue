@@ -168,6 +168,7 @@
                     properties: {
                         operating_system: 'unknown',
                         internet_facing: 'unknown',
+                        antivirus_status: 'unknown',
                         firewall_status: 'unknown',
                         firmware_status: 'unknown',
                         tamper_detection_status: 'unknown',
@@ -259,6 +260,7 @@
                 properties: {
                     operating_system: asset.properties.operating_system,
                     internet_facing: asset.properties.internet_facing,
+                    antivirus_status: asset.properties.antivirus_status,
                     firewall_status: asset.properties.firewall_status,
                     firmware_status: asset.properties.firmware_status,
                     tamper_detection_status: asset.properties.tamper_detection_status,
@@ -313,6 +315,7 @@
             properties: {
                 operating_system: node.data.properties.operating_system,
                 internet_facing: node.data.properties.internet_facing,
+                antivirus_status: node.data.properties.antivirus_status,
                 firewall_status: node.data.properties.firewall_status,
                 firmware_status: node.data.properties.firmware_status,
                 tamper_detection_status: node.data.properties.tamper_detection_status,
