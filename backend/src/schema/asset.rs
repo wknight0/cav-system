@@ -62,6 +62,7 @@ pub struct Position {
 pub struct Properties {
     pub operating_system: String,
     pub internet_facing: String,
+    pub antivirus_status: String,
     pub firewall_status: String,
     pub firmware_status: String,
     pub tamper_detection_status: String,
@@ -79,6 +80,7 @@ impl Properties {
     pub fn new(
         operating_system: String,
         internet_facing: String,
+        antivirus_status: String,
         firewall_status: String,
         firmware_status: String,
         tamper_detection_status: String,
@@ -93,6 +95,7 @@ impl Properties {
         Properties {
             operating_system,
             internet_facing,
+            antivirus_status,
             firewall_status,
             firmware_status,
             tamper_detection_status,
@@ -113,6 +116,10 @@ impl Properties {
     
     pub fn retrieve_internet_facing(&self) -> &str {
         &self.internet_facing
+    }
+
+    pub fn retrieve_antivirus_status(&self) -> &str {
+        &self.antivirus_status
     }
 
     pub fn retrieve_firewall_status(&self) -> &str {

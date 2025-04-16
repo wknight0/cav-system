@@ -37,6 +37,7 @@
 <script setup>
     import BaseNode from './BaseNode.vue';
     import serverIcon from '../../../assets/icons/server.svg';
+    import { RadioButton } from 'primevue';
 
     const internetFacingOptions = [
         { label: 'Yes', value: 'yes' },
