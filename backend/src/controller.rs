@@ -82,19 +82,6 @@ pub async fn remove_connections() -> Result<(), Box<dyn Error>> {
     }
 }
 
-pub async fn remove_ranked_cves() -> Result<(), Box<dyn Error>> {
-    match db_handler::remove_ranked_cves() {
-        Ok(_) => {
-            println!("Ranked cves removed successfully...");
-            Ok(())
-        }
-        Err(e) => {
-            eprintln!("Failed to remove ranked cves: {}", e);
-            Err(e)
-        }
-    }
-}
-
 // Retrieve functions for credentials, cves, assets, and ranked cves
 pub async fn retrieve_credentials() -> Result<Credentials, Box<dyn Error>> {
     match db_handler::retrieve_credentials() {
@@ -143,19 +130,6 @@ pub async fn retrieve_connections() -> Result<Vec<Connection>, Box<dyn Error>> {
         }
         Err(e) => {
             eprintln!("Failed to retrieve connections: {}", e);
-            Err(e)
-        }
-    }
-}
-
-pub async fn retrieve_ranked_cves() -> Result<Vec<RankedCVE>, Box<dyn Error>> {
-    match db_handler::retrieve_ranked_cves() {
-        Ok(ranked_cves) => {
-            println!("Ranked cves retrieved successfully...");
-            Ok(ranked_cves)
-        }
-        Err(e) => {
-            eprintln!("Failed to retrieve ranked cves: {}", e);
             Err(e)
         }
     }
@@ -243,8 +217,8 @@ pub async fn update_connections(connections: Vec<Connection>) -> Result<(), Box<
     }
 }
 
-// Ranks cves and updates the local storage with ranked cves
-pub async fn update_ranked_cves() -> Result<(), Box<dyn Error>> {
+// Ranks cves using cves and assets from local storage and returns ranked cves
+pub async fn create_ranked_cves() -> Result<Vec<RankedCVE>, Box<dyn Error>> {
     let cves: Vec<CVE>;
     let assets: Vec<Asset>;
     let ranked_cves: Vec<RankedCVE>;
@@ -269,16 +243,5 @@ pub async fn update_ranked_cves() -> Result<(), Box<dyn Error>> {
 
     // Rank cves based on cves and assets
     ranked_cves = ranking::rank_cves(cves, assets);
-
-    // Update ranked cves in local database
-    match db_handler::update_ranked_cves(ranked_cves) {
-        Ok(_) => {
-            println!("Ranked cve results saved successfully...");
-            Ok(())
-        }
-        Err(e) => {
-            eprintln!("Failed to save ranked cve results into local database: {}", e);
-            Err(e)
-        }
-    }
+    Ok(ranked_cves)
 }

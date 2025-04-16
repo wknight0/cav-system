@@ -49,15 +49,6 @@ async fn remove_connections() -> bool {
     }
 }
 
-// Tauri command to remove ranked cves using controller
-#[tauri::command]
-async fn remove_ranked_cves() -> bool {
-    match controller::remove_ranked_cves().await {
-        Ok(_results) => true,
-        Err(_e) => false
-    }
-}
-
 // Tauri command to retrieve credentials using controller
 #[tauri::command]
 async fn retrieve_credentials() -> Result<Credentials, String> {
@@ -91,15 +82,6 @@ async fn retrieve_connections() -> Result<Vec<Connection>, String> {
     match controller::retrieve_connections().await {
         Ok(connections) => Ok(connections),
         Err(e) => Err(format!("Failed to retrieve connections: {}", e)),
-    }
-}
-
-// Tauri command to retrieve ranked cves using controller
-#[tauri::command]
-async fn retrieve_ranked_cves() -> Result<Vec<RankedCVE>, String> {
-    match controller::retrieve_ranked_cves().await {
-        Ok(ranked_cves) => Ok(ranked_cves),
-        Err(e) => Err(format!("Failed to retrieve ranked cves: {}", e)),
     }
 }
 
@@ -139,12 +121,12 @@ async fn update_connections(connections: Vec<Connection>) -> bool {
     }
 }
 
-// Tauri command to update ranked cves using controller
+// Tauri command to rank CVEs with assets and return them
 #[tauri::command]
-async fn update_ranked_cves() -> bool {
-    match controller::update_ranked_cves().await {
-        Ok(_results) => true,
-        Err(_e) => false
+async fn create_ranked_cves() -> Result<Vec<RankedCVE>, String> {
+    match controller::create_ranked_cves().await {
+        Ok(ranked_cves) => Ok(ranked_cves),
+        Err(e) => Err(format!("Failed to create ranked cves: {}", e)),
     }
 }
 
@@ -157,17 +139,15 @@ async fn main() {
             remove_cves,
             remove_assets,
             remove_connections,
-            remove_ranked_cves,
             retrieve_credentials,
             retrieve_cves,
             retrieve_assets,
             retrieve_connections,
-            retrieve_ranked_cves,
             update_credentials,
             update_cves,
             update_assets,
             update_connections,
-            update_ranked_cves
+            create_ranked_cves,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,6 +1,5 @@
 use crate::schema::asset::{Asset, Connection};
 use crate::schema::cve::CVE;
-use crate::schema::rank::RankedCVE;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -10,7 +9,6 @@ pub struct Storage {
     pub cves: Vec<CVE>,
     pub assets: Vec<Asset>,
     pub connections: Vec<Connection>,
-    pub ranked_cves: Vec<RankedCVE>,
 }
 
 impl Storage {
@@ -19,14 +17,12 @@ impl Storage {
         let cves = Vec::new();
         let assets = Vec::new();
         let connections = Vec::new();
-        let ranked_cves = Vec::new();
         Storage {
             key,
             credentials,
             cves,
             assets,
             connections,
-            ranked_cves,
         }
     }
 
@@ -51,10 +47,6 @@ impl Storage {
         &self.connections
     }
 
-    pub fn retrieve_ranked_cves(&self) -> &Vec<RankedCVE> {
-        &self.ranked_cves
-    }
-
     // Set methods for individual fields
     pub fn update_key(&mut self, key: String) {
         self.key = key;
@@ -74,10 +66,6 @@ impl Storage {
 
     pub fn update_connections(&mut self, connections: Vec<Connection>) {
         self.connections = connections;
-    }
-
-    pub fn update_ranked_cves(&mut self, ranked_cves: Vec<RankedCVE>) {
-        self.ranked_cves = ranked_cves;
     }
 }
 

@@ -206,7 +206,6 @@
         margin-bottom: 1rem;
         border: 1px solid #ddd;
         border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         overflow: hidden;
         padding: 1rem;
         cursor: pointer;
@@ -237,14 +236,7 @@
         margin-top: 1rem;
     }
 
-    .loading-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-    }
-
-    .card-container {
+    .loading-container, .card-container {
         display: flex;
         justify-content: center;
         align-items: center;

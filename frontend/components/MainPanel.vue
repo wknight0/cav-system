@@ -26,6 +26,10 @@
 
     // Function to switch views
     const switchView = (view, viewText) => {
+        if (!view) {
+            console.error(`Invalid view: ${view}`);
+            return;
+        }
         currentView.value = view;
         currentTextView.value = viewText;
     };

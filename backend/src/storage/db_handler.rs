@@ -8,7 +8,6 @@ use polodb_core::Database;
 
 use crate::schema::asset::{Asset, Connection};
 use crate::schema::cve::CVE;
-use crate::schema::rank::RankedCVE;
 use crate::schema::storage::{Storage, Credentials};
 
 // Initializes new local storage instance and inserts into local database if it doesn't exist
@@ -32,7 +31,6 @@ pub fn initialize_storage() -> Result<(), Box<dyn std::error::Error>> {
             cves: Vec::new(),
             assets: Vec::new(),
             connections: Vec::new(),
-            ranked_cves: Vec::new(),
         };
         collection.insert_one(storage)?;
     }
@@ -103,23 +101,7 @@ pub fn remove_connections() -> Result<(), Box<dyn std::error::Error>> {
     }
 }
 
-// Removes ranked cves from the local storage
-pub fn remove_ranked_cves() -> Result<(), Box<dyn std::error::Error>> {
-    let db_path = String::from("./cache_storage/local");
-    let db = Database::open_file(db_path)?;
-    let collection = db.collection::<Storage>("local");
-
-    let filter = doc! { "key": "local" };
-
-    if let Some(_) = collection.find_one(filter.clone())? {
-        collection.update_one(filter, doc! { "$unset": { "ranked_cves": "" } })?;
-        Ok(())
-    } else {
-        Err(Box::from("Storage not found..."))
-    }
-}
-
-// Retrieve methods for credentials, cves, assets, and ranked cves
+// Retrieve methods for credentials, cves, assets
 pub fn retrieve_credentials() -> Result<Credentials, Box<dyn std::error::Error>> {
     let db_path = String::from("./cache_storage/local");
     let db = Database::open_file(db_path)?;
@@ -178,21 +160,7 @@ pub fn retrieve_connections() -> Result<Vec<Connection>, Box<dyn std::error::Err
     }
 }
 
-pub fn retrieve_ranked_cves() -> Result<Vec<RankedCVE>, Box<dyn std::error::Error>> {
-    let db_path = String::from("./cache_storage/local");
-    let db = Database::open_file(db_path)?;
-    let collection = db.collection::<Storage>("local");
-
-    let filter = doc! { "key": "local" };
-
-    if let Some(storage) = collection.find_one(filter)? {
-        Ok(storage.ranked_cves)
-    } else {
-        Err(Box::from("Storage not found when retrieving ranked cves..."))
-    }
-}
-
-// Set methods for credentials, cves, assets, and ranked cves
+// Set methods for credentials, cves, assets
 pub fn update_credentials(credentials: Credentials) -> Result<(), Box<dyn Error>> {
     let db_path = String::from("./cache_storage/local");
 
@@ -297,32 +265,6 @@ pub fn update_connections(connections: Vec<Connection>) -> Result<(), Box<dyn Er
         doc! { "$set": { "connections": connections_bson } },
     ).map_err(|e| {
         eprintln!("Failed to update connections: {}", e);
-        Box::new(e) as Box<dyn Error>
-    })?;
-
-    Ok(())
-}
-
-pub fn update_ranked_cves(ranked_cves: Vec<RankedCVE>) -> Result<(), Box<dyn Error>> {
-    let db_path = String::from("./cache_storage/local");
-
-    let db = Database::open_file(db_path).map_err(|e| {
-        eprintln!("Failed to open database: {}", e);
-        Box::new(e) as Box<dyn Error>
-    })?;
-
-    let collection = db.collection::<Storage>("local");
-
-    let ranked_cves_bson = to_bson(&ranked_cves).map_err(|e| {
-        eprintln!("Failed to convert ranked_cves to BSON: {}", e);
-        Box::new(e) as Box<dyn Error>
-    })?;
-
-    collection.update_one(
-        doc! { "key": "local" },
-        doc! { "$set": { "ranked_cves": ranked_cves_bson } },
-    ).map_err(|e| {
-        eprintln!("Failed to update ranked cves: {}", e);
         Box::new(e) as Box<dyn Error>
     })?;
 
