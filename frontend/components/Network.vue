@@ -9,7 +9,7 @@
                 :fit-view="true"
                 :pan-on-drag="true"
                 :zoom-on-double-click="false"
-                class="vue-flow-container"
+                class="vue-flow-network-container"
                 @connect="onConnect"
                 @connect-start="onConnectStart"
                 @connect-stop="onConnectStop"
@@ -117,8 +117,6 @@
     import IoTDeviceNode from './Assets/Nodes/IoTDeviceNode.vue';
     import { createEthernetEdge } from './Assets/Edges/EthernetEdge.vue';
     import { createWirelessEdge } from './Assets/Edges/WirelessEdge.vue';
-
-    const { fitView } = useVueFlow();
 
     const nodeTypes = {
         Switch: markRaw(SwitchNode),
@@ -371,7 +369,7 @@
         border: white 2px solid;
     }
 
-    .vue-flow-container {
+    .vue-flow-network-container {
         height: 100%;
         width: 100%;
         max-width: calc(100% - 150px);
