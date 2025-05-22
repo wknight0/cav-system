@@ -1,5 +1,5 @@
 <script>
-    export const createWirelessEdge = (params, edgeId) => {
+    export const createWirelessEdge = (params, edgeId, color) => {
         return {
             id: edgeId,
             ...params,
@@ -7,7 +7,7 @@
             connection_type: 'wireless',
             animated: false,
             style: {
-                stroke: 'var(--secondary-color)',
+                stroke: 'var(--tertiary-color)',
                 strokeDasharray: '8 8',
                 strokeWidth: 8,
             },

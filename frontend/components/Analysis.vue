@@ -15,7 +15,7 @@
 
         <div v-else class="analysis-container">
             <div class="ranked-cves-list">
-                <Card v-for="(ranked_cve, index) in ranked_cves" @click="toggleDetails(index)" class="ranked-cve-card">
+                <Card v-for="(ranked_cve, index) in ranked_cves" @mouseenter="highlightHosts(ranked_cve.cve.host_address)" @click="toggleDetails(index)" class="ranked-cve-card">
                     <template #header>
                         <div class="card-header">
                             <h5 class="card-title">{{ ranked_cve.cve.name }}</h5>
@@ -101,6 +101,22 @@
         showAnalysis.value = true;
     }
 
+    // Highlights hosts that have been affected by the CVE
+    async function highlightHosts(hostAddresses) {
+        const hostSet = new Set(hostAddresses);
+
+        nodes.value.forEach(node => {
+            const nodeElement = document.querySelector(`[data-id="${node.id}"]`);
+            if (nodeElement) {
+                if (hostSet.has(node.data.ip_address)) {
+                    nodeElement.classList.add('highlighted');
+                } else {
+                    nodeElement.classList.remove('highlighted');
+                }
+            }
+        });
+    }
+
     /*
         Component to display network view of ranked CVEs, using VueFlow to create a network graph of the ranked CVEs and their relationships.
     */
@@ -162,12 +178,12 @@
             switch (connection.connection_type) {
                 case ('ethernet'):
                     return createEthernetEdge(
-                        { source: connection.source, target: connection.destination },
+                        { source: connection.source, target: connection.destination, color: 'var(--primary-color)' },
                         edgeId
                     );
                 case ('wireless'):
                     return createWirelessEdge(
-                        { source: connection.source, target:connection.destination },
+                        { source: connection.source, target:connection.destination, color: 'var(--primary-color)' },
                         edgeId
                     );
                 default:
@@ -274,5 +290,9 @@
     .toggle-icon {
         font-size: 1rem;
         cursor: pointer;
+    }
+
+    .highlighted {
+        filter: brightness(0%) saturate(100%) invert(81%) sepia(31%) saturate(527%) hue-rotate(100deg) brightness(91%) contrast(104%) !important;
     }
 </style>

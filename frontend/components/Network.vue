@@ -279,12 +279,12 @@
             switch (connection.connection_type) {
                 case ('ethernet'):
                     return createEthernetEdge(
-                        { source: connection.source, target: connection.destination },
+                        { source: connection.source, target: connection.destination, color: '#32a852' },
                         edgeId
                     );
                 case ('wireless'):
                     return createWirelessEdge(
-                        { source: connection.source, target:connection.destination },
+                        { source: connection.source, target:connection.destination, color: 'var(--secondary-color)' },
                         edgeId
                     );
                 default:

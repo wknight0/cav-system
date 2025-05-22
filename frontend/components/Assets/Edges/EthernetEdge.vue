@@ -1,5 +1,5 @@
 <script>
-    export const createEthernetEdge = (params, edgeId) => {
+    export const createEthernetEdge = (params, edgeId, color) => {
         return {
             id: edgeId,
             ...params,
@@ -7,7 +7,7 @@
             connection_type: 'ethernet',
             animated: false,
             style: {
-                stroke: 'var(--secondary-color)',
+                stroke: 'var(--tertiary-color)',
                 strokeWidth: 2,
             },
         };
