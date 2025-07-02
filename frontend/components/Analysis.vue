@@ -235,12 +235,12 @@
             switch (connection.connection_type) {
                 case ('ethernet'):
                     return createEthernetEdge(
-                        { source: connection.source, target: connection.destination },
+                        { source: connection.source, target: connection.destination, color: 'var(--primary-text-color)' },
                         edgeId
                     );
                 case ('wireless'):
                     return createWirelessEdge(
-                        { source: connection.source, target:connection.destination },
+                        { source: connection.source, target:connection.destination, color: 'var(--primary-text-color)' },
                         edgeId
                     );
                 default:
@@ -355,5 +355,9 @@
     .toggle-icon {
         font-size: 1rem;
         cursor: pointer;
+    }
+
+    .highlighted {
+        filter: brightness(0%) saturate(100%) invert(81%) sepia(31%) saturate(527%) hue-rotate(100deg) brightness(91%) contrast(104%) !important;
     }
 </style>

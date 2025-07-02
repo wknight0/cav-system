@@ -7,7 +7,7 @@
             connection_type: 'ethernet',
             animated: false,
             style: {
-                stroke: params.color || 'var(--primary-text-color)',
+                stroke: params.color,
                 strokeWidth: 2,
                 opacity: 0.8,
             },

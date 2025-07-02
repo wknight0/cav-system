@@ -24,7 +24,7 @@
     --primary-text-color: white;
     --secondary-color: #6ee7b7;
     --secondary-text-color: black;
-    --tertiary-color: #09090b;
+    --tertiary-color: #939393;
     --warning-color: rgb(177, 51, 51);
   }
 
