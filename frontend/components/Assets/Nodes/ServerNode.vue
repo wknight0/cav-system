@@ -1,5 +1,5 @@
 <template>
-    <BaseNode :data="data" :icon="serverIcon" :showHandles="showHandles">
+    <BaseNode :data="data" :icon="data.isHighlighted ? highlightedServerIcon : serverIcon" :showHandles="showHandles">
         <!-- Internet facing property -->
         <div class="form-group radio-group">
             <div class="radio-row">
@@ -37,6 +37,7 @@
 <script setup>
     import BaseNode from './BaseNode.vue';
     import serverIcon from '../../../assets/icons/server.svg';
+    import highlightedServerIcon from '../../../assets/highlightedIcons/server-highlight.svg';
     import { RadioButton } from 'primevue';
 
     const internetFacingOptions = [

@@ -1,5 +1,5 @@
 <template>
-    <BaseNode :data="data" :icon="IoTDeviceIcon" :showHandles="showHandles">
+    <BaseNode :data="data" :icon="data.isHighlighted ? highlightedIoTDeviceIcon : IoTDeviceIcon" :showHandles="showHandles">
         <!-- Firmware status property -->
         <div class="form-group radio-group">
             <div class="radio-row">
@@ -37,6 +37,7 @@
 <script setup>
     import BaseNode from './BaseNode.vue';
     import IoTDeviceIcon from '../../../assets/icons/iotdevice.svg';
+    import highlightedIoTDeviceIcon from '../../../assets/highlightedIcons/iotdevice-highlight.svg';
     import { RadioButton } from 'primevue';
 
     const firmwareOptions = [

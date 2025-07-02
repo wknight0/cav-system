@@ -1,5 +1,5 @@
 <template>
-    <BaseNode :data="data" :icon="laptopIcon" :showHandles="showHandles">
+    <BaseNode :data="data" :icon="data.isHighlighted ? highlightedLaptopIcon : laptopIcon" :showHandles="showHandles">
         <!-- Operating system property -->
         <div class="form-group radio-group">
             <div class="radio-row">
@@ -53,6 +53,7 @@
 <script setup>
     import BaseNode from './BaseNode.vue';
     import laptopIcon from '../../../assets/icons/wirelessclient.svg';
+    import highlightedLaptopIcon from '../../../assets/highlightedIcons/wirelessclient-highlight.svg';
     import { RadioButton } from 'primevue';
 
     const osOptions = [

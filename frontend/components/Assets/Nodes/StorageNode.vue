@@ -1,5 +1,5 @@
 <template>
-    <BaseNode :data="data" :icon="storageIcon" :showHandles="showHandles">
+    <BaseNode :data="data" :icon="data.isHighlighted ? highlightedStorageIcon : storageIcon" :showHandles="showHandles">
         <!-- Encryption enabled property -->
         <div class="form-group radio-group">
             <div class="radio-row">
@@ -21,6 +21,7 @@
 <script setup>
     import BaseNode from './BaseNode.vue';
     import storageIcon from '../../../assets/icons/storage.svg';
+    import highlightedStorageIcon from '../../../assets/highlightedIcons/storage-highlight.svg';
     import { RadioButton } from 'primevue';
 
     const encryptionOptions = [

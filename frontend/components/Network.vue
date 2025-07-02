@@ -99,11 +99,11 @@
 </template>
 
 <script setup>
-    import { ref, markRaw, watch } from 'vue';
+    import { ref, markRaw, watch, nextTick, onMounted } from 'vue';
     import { invoke } from '@tauri-apps/api/tauri';
     import { VueFlow, useVueFlow } from '@vue-flow/core';
     import '@vue-flow/core/dist/style.css';
-    import { Button, Dialog } from 'primevue';
+    import { Button } from 'primevue';
     import SwitchNode from './Assets/Nodes/SwitchNode.vue';
     import RouterNode from './Assets/Nodes/RouterNode.vue';
     import FirewallNode from './Assets/Nodes/FirewallNode.vue';
@@ -117,6 +117,8 @@
     import IoTDeviceNode from './Assets/Nodes/IoTDeviceNode.vue';
     import { createEthernetEdge } from './Assets/Edges/EthernetEdge.vue';
     import { createWirelessEdge } from './Assets/Edges/WirelessEdge.vue';
+
+    const { fitView } = useVueFlow();
 
     const nodeTypes = {
         Switch: markRaw(SwitchNode),
@@ -190,18 +192,13 @@
 
     // onConnect attribute for connecting nodes together for Vue Flow
     const onConnect = (params) => {
+        params.color = "var(--secondary-color)";
         const edgeId = `edge-${edges.value.length + 1}`;
         let newEdge;
 
         if (selectedConnectionType.value === 'ethernet') {
             newEdge = createEthernetEdge(params, edgeId);
         } else if (selectedConnectionType.value === 'wireless') {
-            newEdge = createWirelessEdge(params, edgeId);
-        }
-
-        if (selectedConnectionType.value === 'ethernet') {
-            newEdge = createEthernetEdge(params, edgeId);
-        } else if (selectConnectionType.value === 'wireless') {
             newEdge = createWirelessEdge(params, edgeId);
         }
 
@@ -279,12 +276,12 @@
             switch (connection.connection_type) {
                 case ('ethernet'):
                     return createEthernetEdge(
-                        { source: connection.source, target: connection.destination },
+                        { source: connection.source, target: connection.destination, color: "var(--secondary-color)" },
                         edgeId
                     );
                 case ('wireless'):
                     return createWirelessEdge(
-                        { source: connection.source, target:connection.destination },
+                        { source: connection.source, target:connection.destination, color: "var(--secondary-color)" },
                         edgeId
                     );
                 default:
@@ -293,7 +290,10 @@
             }
         }).filter(edge => edge !== null);
 
-        console.log('Network loaded...');
+        await nextTick();
+        setTimeout(() => {
+            fitView({ padding: 0.5, duration: 600 });
+        }, 100);
     }
 
     // Clears the network topology
@@ -351,7 +351,9 @@
         }
     }    
     
-    loadNetwork();
+    onMounted(() => {
+        loadNetwork();
+    });
 </script>
 
 <style>

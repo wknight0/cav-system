@@ -15,7 +15,13 @@
 
         <div v-else class="analysis-container">
             <div class="ranked-cves-list">
-                <Card v-for="(ranked_cve, index) in ranked_cves" @click="toggleDetails(index)" class="ranked-cve-card">
+                <Card
+                    v-for="(ranked_cve, index) in ranked_cves"
+                    :key="index"
+                    @click="onCveCardClick(index, ranked_cve.cve.host_address)"
+                    class="ranked-cve-card"
+                    :class="{ 'selected-cve': selectedCveIndex === index }"
+                >
                     <template #header>
                         <div class="card-header">
                             <h5 class="card-title">{{ ranked_cve.cve.name }}</h5>
@@ -44,7 +50,7 @@
 </template>
 
 <script setup>
-    import { ref, markRaw, watch, onMounted } from 'vue';
+    import { ref, markRaw, watch, onMounted, nextTick } from 'vue';
     import { invoke } from '@tauri-apps/api/tauri';
     import { VueFlow, useVueFlow } from '@vue-flow/core';
     import { Card } from 'primevue';
@@ -68,6 +74,7 @@
     /*
         Component to display ranked CVEs and their details. It fetches the ranked CVEs from the backend and displays them in a list format.
     */
+    const { fitView } = useVueFlow();
     const ranked_cves = ref([]);
     const nodes = ref([]);
     const edges = ref([]);
@@ -75,12 +82,78 @@
     const loadingRankedCves = ref(true);
     const rankedCveError = ref(false);
     const expandedDetails = ref([]);
+    const selectedCveIndex = ref();
+    const highlightedNodes = ref([]);
+
+    // Toggles the detail and highlighting of a node in the network view upon clicking a ranked cve card
+    function onCveCardClick(index, host_addresses) {
+        toggleDetails(index);
+
+        if (selectedCveIndex.value === index) {
+            selectedCveIndex.value = null;
+            disableAssetHighlight();
+            focusHighlightedNodes();
+        } else {
+            selectedCveIndex.value = index;
+            enableAssetHighlight(host_addresses);
+            focusHighlightedNodes();
+        }
+    }
+
+    // Focuses the vue flow canvas to the specific node(s)
+    function focusHighlightedNodes() {
+        const ids = nodes.value
+            .filter(node => highlightedNodes.value.includes(node.data?.ip_address))
+            .map(node => node.id);
+
+        if (ids.length > 0) {
+            fitView({ nodes: ids, padding: 0.5, duration: 600 });
+        } else {
+            fitView({ padding: 0.5, duration: 600 });
+        }
+    }
 
     // Toggles the details of a ranked cve card
     function toggleDetails(index) {
-        expandedDetails.value[index] = !expandedDetails.value[index];
+        expandedDetails.value = expandedDetails.value.map((_, i) => i === index ? !expandedDetails.value[index] : false);
     }
-    
+
+    // Enables the highlight of relevant assets for a hovered ranked cve card
+    function enableAssetHighlight(host_addresses) {
+        const highlightList = Array.isArray(host_addresses) ? host_addresses : [host_addresses];
+        highlightedNodes.value = highlightList;
+
+        nodes.value = nodes.value.map(node => ({
+            ...node,
+            data: {
+                ...node.data,
+                isHighlighted: highlightedNodes.value.includes(node.data?.ip_address)
+            },
+            style: {
+                ...(node.style || {}),
+                color: highlightedNodes.value.includes(node.data?.ip_address) ? 'var(--secondary-color)' : 'var(--primary-text-color)',
+            }
+        }));
+    }
+
+    // Disables the highlight of relevant assets for a hovered ranked cve card
+    function disableAssetHighlight(host_addresses) {
+        selectedCveIndex.value = null;
+        highlightedNodes.value = [];
+
+        nodes.value = nodes.value.map(node => ({
+            ...node,
+            data: {
+                ...node.data,
+                isHighlighted: false,
+            },
+            style: {
+                ...(node.style || {}),
+                color: 'var(--primary-text-color)',
+            }
+        }));
+    }
+
     // Fetches CVEs and Assets, ranks the CVEs, and returns them to display to frontend
     async function createRankedCves() {
         loadingRankedCves.value = true;
@@ -176,12 +249,15 @@
             }
         }).filter(edge => edge !== null);
 
-        console.log('Network loaded...');
+        await nextTick();
+        setTimeout(() => {
+            fitView({ padding: 0.5, duration: 600 });
+        }, 100);
     }
 
     onMounted(async () => {
         await createRankedCves();
-        loadNetwork();
+        await loadNetwork();
     });
 </script>
 
@@ -233,6 +309,11 @@
     }
 
     .ranked-cve-card:hover {
+        transform: scale(1.05);
+    }
+
+    .ranked-cve-card.selected-cve {
+        border: 2px solid var(--secondary-color);
         border-color: var(--secondary-color);
     }
 

@@ -1,5 +1,5 @@
 <template>
-    <BaseNode :data="data" :icon="printerIcon" :showHandles="showHandles">
+    <BaseNode :data="data" :icon="data.isHighlighted ? highlightedPrinterIcon : printerIcon" :showHandles="showHandles">
         <!-- Network enabled property -->
         <div class="form-group radio-group">
             <div class="radio-row">
@@ -21,6 +21,7 @@
 <script setup>
     import BaseNode from './BaseNode.vue';
     import printerIcon from '../../../assets/icons/printer.svg';
+    import highlightedPrinterIcon from '../../../assets/highlightedIcons/printer-highlight.svg';
     import { RadioButton } from 'primevue';
 
     const networkOptions = [

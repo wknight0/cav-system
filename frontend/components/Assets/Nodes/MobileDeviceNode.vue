@@ -1,5 +1,5 @@
 <template>
-    <BaseNode :data="data" :icon="mobilePhoneIcon" :showHandles="showHandles">
+    <BaseNode :data="data" :icon="data.isHighlighted ? highlightedMobilePhoneIcon : mobilePhoneIcon" :showHandles="showHandles">
         <!-- Operating system property -->
         <div class="form-group radio-group">
             <div class="radio-row">
@@ -21,6 +21,7 @@
 <script setup>
     import BaseNode from './BaseNode.vue';
     import mobilePhoneIcon from '../../../assets/icons/wirelessphone.svg';
+    import highlightedMobilePhoneIcon from '../../../assets/highlightedIcons/wirelessphone-highlight.svg';
     import { RadioButton } from 'primevue';
 
     const osOptions = [

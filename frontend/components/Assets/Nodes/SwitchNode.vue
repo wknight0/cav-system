@@ -1,5 +1,5 @@
 <template>
-    <BaseNode :data="data" :icon="switchIcon" :showHandles="showHandles">
+    <BaseNode :data="data" :icon="data.isHighlighted ? highlightedSwitchIcon : switchIcon" :showHandles="showHandles">
         <!-- VLAN support property -->
         <div class="form-group radio-group">
             <div class="radio-row">
@@ -37,6 +37,7 @@
 <script setup>
     import BaseNode from './BaseNode.vue';
     import switchIcon from '../../../assets/icons/switch.svg';
+    import highlightedSwitchIcon from '../../../assets/highlightedIcons/switch-highlight.svg';
     import { RadioButton } from 'primevue';
 
     const vlanOptions = [

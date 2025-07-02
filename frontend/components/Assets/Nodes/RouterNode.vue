@@ -1,5 +1,5 @@
 <template>
-    <BaseNode :data="data" :icon="routerIcon" :showHandles="showHandles">
+    <BaseNode :data="data" :icon="data.isHighlighted ? highlightedRouterIcon : routerIcon" :showHandles="showHandles">
         <!-- Firewall status property -->
         <div class="form-group radio-group">
             <div class="radio-row">
@@ -37,6 +37,7 @@
 <script setup>
     import BaseNode from './BaseNode.vue';
     import routerIcon from '../../../assets/icons/router.svg';
+    import highlightedRouterIcon from '../../../assets/highlightedIcons/router-highlight.svg';
     import { RadioButton } from 'primevue';
 
     const firewallOptions = [

@@ -7,9 +7,10 @@
             connection_type: 'wireless',
             animated: false,
             style: {
-                stroke: 'var(--secondary-color)',
+                stroke: params.color || 'var(--primary-text-color)',
                 strokeDasharray: '8 8',
                 strokeWidth: 8,
+                opacity: 0.8,
             },
         };
     };

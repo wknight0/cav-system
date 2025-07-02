@@ -7,8 +7,9 @@
             connection_type: 'ethernet',
             animated: false,
             style: {
-                stroke: 'var(--secondary-color)',
+                stroke: params.color || 'var(--primary-text-color)',
                 strokeWidth: 2,
+                opacity: 0.8,
             },
         };
     };

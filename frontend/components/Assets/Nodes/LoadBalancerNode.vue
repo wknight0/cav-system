@@ -1,5 +1,5 @@
 <template>
-    <BaseNode :data="data" :icon="loadBalancerIcon" :showHandles="showHandles">
+    <BaseNode :data="data" :icon="data.isHighlighted ? highlightedLoadBalancerIcon : loadBalancerIcon" :showHandles="showHandles">
         <!-- SSL offloading status property -->
         <div class="form-group radio-group">
             <div class="radio-row">
@@ -37,6 +37,7 @@
 <script setup>
     import BaseNode from './BaseNode.vue';
     import loadBalancerIcon from '../../../assets/icons/loadbalancer.svg';
+    import highlightedLoadBalancerIcon from '../../../assets/highlightedIcons/loadbalancer-highlight.svg';
     import { RadioButton } from 'primevue';
 
     const sslOffloadingOptions = [
