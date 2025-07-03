@@ -1,5 +1,13 @@
 <template>
     <div class="base-node">
+        <!-- Severity bubble that displays the severity percentage only if applicable in analysis component -->
+        <span
+            v-if="data.severity !== null && data.severity !== undefined"
+            class="severity-bubble"
+            :style="{ backgroundColor: getSeverityColor(data.severity) }"
+        >
+            {{ data.severity.toFixed(1) }}%
+        </span>
         <!-- Handle for connections -->
         <Handle
             type="target"
@@ -69,6 +77,12 @@
     const openProperties = () => {
         showPopup.value = true;
     };
+
+    function getSeverityColor(severity) {
+        if (severity >= 75) return '#e53935';
+        if (severity >= 40) return '#ffb300';
+        return '#43a047';
+    }
 </script>
 
 <style scoped>
@@ -81,6 +95,24 @@
         height: 50px;
         text-align: center;
         position: relative;
+    }
+
+    .severity-bubble {
+        position: absolute;
+        top: -16px;
+        right: -4px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.55em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 20;
+        letter-spacing: 0.01em;
+        background: var(--secondary-color);
     }
 
     .node-background {

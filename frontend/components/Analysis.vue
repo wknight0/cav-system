@@ -18,7 +18,7 @@
                 <Card
                     v-for="(ranked_cve, index) in ranked_cves"
                     :key="index"
-                    @click="onCveCardClick(index, ranked_cve.cve.host_address)"
+                    @click="onCveCardClick(index, ranked_cve.host_severity)"
                     class="ranked-cve-card"
                     :class="{ 'selected-cve': selectedCveIndex === index }"
                 >
@@ -29,7 +29,11 @@
                         </div>
                         <div v-if="expandedDetails[index]" class="card-details">
                             <p class="card-text"><strong>CVE_ID:</strong> {{ ranked_cve.cve.cve_id }}</p>
-                            <p class="card-text"><strong>Affected Asset Addresses:</strong> {{ ranked_cve.cve.host_address }}</p>
+                            <p class="card-text"><strong>Affected Asset Addresses:</strong>
+                                <span v-for="(severity, ip) in ranked_cve.host_severity" :key="ip">
+                                    {{ ip }} ({{ severity.toFixed(1) }}%)<br>
+                                </span>
+                            </p>
                         </div>
                     </template>
                 </Card>
@@ -83,10 +87,10 @@
     const rankedCveError = ref(false);
     const expandedDetails = ref([]);
     const selectedCveIndex = ref();
-    const highlightedNodes = ref([]);
+    const highlightedNodes = ref({});
 
     // Toggles the detail and highlighting of a node in the network view upon clicking a ranked cve card
-    function onCveCardClick(index, host_addresses) {
+    function onCveCardClick(index, host_severity) {
         toggleDetails(index);
 
         if (selectedCveIndex.value === index) {
@@ -95,7 +99,7 @@
             focusHighlightedNodes();
         } else {
             selectedCveIndex.value = index;
-            enableAssetHighlight(host_addresses);
+            enableAssetHighlight(host_severity);
             focusHighlightedNodes();
         }
     }
@@ -103,7 +107,7 @@
     // Focuses the vue flow canvas to the specific node(s)
     function focusHighlightedNodes() {
         const ids = nodes.value
-            .filter(node => highlightedNodes.value.includes(node.data?.ip_address))
+            .filter(node => highlightedNodes.value[node.data?.ip_address] !== undefined)
             .map(node => node.id);
 
         if (ids.length > 0) {
@@ -119,33 +123,36 @@
     }
 
     // Enables the highlight of relevant assets for a hovered ranked cve card
-    function enableAssetHighlight(host_addresses) {
-        const highlightList = Array.isArray(host_addresses) ? host_addresses : [host_addresses];
-        highlightedNodes.value = highlightList;
+    function enableAssetHighlight(host_severity) {
+        highlightedNodes.value = host_severity;
 
         nodes.value = nodes.value.map(node => ({
             ...node,
             data: {
                 ...node.data,
-                isHighlighted: highlightedNodes.value.includes(node.data?.ip_address)
+                severity: highlightedNodes.value[node.data?.ip_address] ?? null,
+                isHighlighted: highlightedNodes.value[node.data?.ip_address] !== undefined,
             },
             style: {
                 ...(node.style || {}),
-                color: highlightedNodes.value.includes(node.data?.ip_address) ? 'var(--secondary-color)' : 'var(--primary-text-color)',
+                color: highlightedNodes.value[node.data?.ip_address] !== undefined
+                    ? 'var(--secondary-color)'
+                    : 'var(--primary-text-color)',
             }
         }));
     }
 
     // Disables the highlight of relevant assets for a hovered ranked cve card
-    function disableAssetHighlight(host_addresses) {
+    function disableAssetHighlight() {
         selectedCveIndex.value = null;
-        highlightedNodes.value = [];
+        highlightedNodes.value = {};
 
         nodes.value = nodes.value.map(node => ({
             ...node,
             data: {
                 ...node.data,
                 isHighlighted: false,
+                severity: null,
             },
             style: {
                 ...(node.style || {}),

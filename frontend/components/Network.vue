@@ -165,6 +165,7 @@
                     label,
                     showHandles: !!selectedConnectionType.value,
                     ip_address: '',
+                    severity: null,
                     properties: {
                         operating_system: 'unknown',
                         internet_facing: 'unknown',
@@ -252,6 +253,7 @@
                 label: asset.label,
                 showHandles: false,
                 ip_address: asset.ip_address,
+                severity: null,
                 properties: {
                     operating_system: asset.properties.operating_system,
                     internet_facing: asset.properties.internet_facing,

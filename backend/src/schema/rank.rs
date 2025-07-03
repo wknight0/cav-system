@@ -1,4 +1,4 @@
-use std::ops;
+use std::{collections::HashMap, ops};
 use serde::{Deserialize, Serialize};
 
 use crate::schema::cve::CVE;
@@ -68,10 +68,11 @@ impl PartialEq<CIAScore> for CIAScore {
 pub struct RankedCVE {
     pub score: f32,
     pub cve: CVE,
+    pub host_severity: HashMap<String, f32>,
 }
 
 impl RankedCVE {
-    pub fn new(score: f32, cve: CVE) -> RankedCVE {
-        RankedCVE { score, cve }
+    pub fn new(score: f32, cve: CVE, host_severity: HashMap<String, f32>) -> RankedCVE {
+        RankedCVE { score, cve, host_severity }
     }
 }

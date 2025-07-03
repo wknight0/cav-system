@@ -1,5 +1,24 @@
 export interface NodeData {
     label: string;
+    ip_address?: string;
+    severity?: number | null;
+    isHighlighted?: boolean;
+    showHandles?: boolean;
+    properties?: {
+        operating_system?: string;
+        internet_facing?: boolean;
+        antivirus_status?: string;
+        firewall_status?: string;
+        firmware_status?: string;
+        tamper_detection_status?: string;
+        vpn_support?: boolean;
+        vlan_support?: boolean;
+        poe_support?: boolean;
+        encryption_enabled?: boolean;
+        virtualization_enabled?: boolean;
+        network_enabled?: boolean;
+        health_check_enabled?: boolean;
+    };
     [key: string]: any;
 }
   

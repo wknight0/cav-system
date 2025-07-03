@@ -1,4 +1,6 @@
-use std::cmp::Ordering;
+use std::{cmp::Ordering, collections::HashMap};
+
+use tauri::utils::assets;
 
 use crate::schema::{cve::CVE, asset::Asset, rank::RankedCVE};
 
@@ -11,11 +13,15 @@ pub fn rank_cves(cves: Vec<CVE>, _assets: Vec<Asset>) -> Vec<RankedCVE> {
         let cia_score = cve.retrieve_values();
         let raw_score = (cia_score.c + cia_score.i + cia_score.a) / max_score;
         let score = raw_score * 100.0;
+        let mut host_severity: HashMap<String, f32> = HashMap::new();
 
-        ranked_cves.push(RankedCVE {
-            cve: cve,
-            score,
-        });
+        for host in cve.retrieve_host_address() {
+            // TEMP INDIVIDUAL HOST SEVERITY SETTING
+            let host_score: f32 = score;
+            host_severity.insert(host.clone(), host_score);
+        }
+
+        ranked_cves.push(RankedCVE::new(score, cve.clone(), host_severity));
     }
 
     let sort_function = | a: &RankedCVE, b: &RankedCVE | -> Ordering {
